@@ -1,0 +1,395 @@
+TRENDY Campus Ambassador Program (TCAP) - Project Documentation
+================================================================
+
+Project Overview
+----------------
+TCAP is a production-grade MVP web application built with Next.js 15, TypeScript, Tailwind CSS, Supabase, Cloudinary, and Resend. It provides a futuristic ambassador onboarding flow, role-based dashboard experiences, gamified task tracking, and modular architecture for future expansion.
+
+Implemented Features
+--------------------
+- Premium landing page with animated hero scene using React Three Fiber and neon cyber styling.
+- Multi-stage registration flow with Google authentication, stage gating, and locked email fields.
+- Supabase authentication and session management.
+- Ambassador, Manager, and Admin dashboard structures with separate layouts.
+- Onboarding stage builder with personal and location/referral forms.
+- Sample RBAC route protection middleware and role constants.
+- Supabase client helper and server helpers for authenticated operations.
+- Cloudinary upload helper for profile images, certificates, and task proof.
+- Resend email helper for verification notifications.
+- Responsive mobile-first UI with glassmorphism and dark cyber aesthetics.
+- Documentation for architecture, environment, and deployment.
+
+Folder Structure Explanation
+----------------------------
+src/ - Main application source.
+  app/ - Next.js App Router routes, layouts, and pages.
+    page.tsx - Public landing page.
+    layout.tsx - Root layout applied to all pages.
+    loading.tsx - Global loading placeholder.
+    error.tsx - Global error page.
+    not-found.tsx - 404 page.
+    api/ - Server API routes for email verification and auth actions.
+    auth/ - Route group for auth pages (/auth/*).
+    dashboard/ - Route group for dashboard pages (/dashboard/*).
+  components/ - Reusable UI and feature components.
+    hero/ - Three.js hero scene and visual effects.
+    onboarding/ - Onboarding UI components and stepper.
+    dashboard/ - Dashboard sidebar and overview modules.
+    ui/ - Reusable UI primitives like Button and Card.
+  constants/ - Shared constants for roles and fixed values.
+  features/ - Feature-specific stateful components and forms.
+  hooks/ - Client-side custom hooks and onboarding support.
+  lib/ - Integration helpers for Supabase, Cloudinary, and Resend.
+  providers/ - React providers and session wrappers.
+  services/ - Data service functions for auth, users, and tasks.
+  store/ - Zustand stores for auth, onboarding, and reactive client state.
+  styles/ - Global style file imported by the app.
+  types/ - TypeScript type definitions for core entities.
+
+Tech Stack Explanation
+----------------------
+- Next.js 15 with App Router: app-level routes, layouts, loading and error boundaries.
+- React 19: modern UI and hooks.
+- TypeScript: strict typing and safer developer experience.
+- Tailwind CSS: rapid styling and responsive design.
+- GSAP / ScrollTrigger: planned animation integration for sections and transitions.
+- Three.js / React Three Fiber / Drei: immersive 3D hero scene.
+- Zustand: lightweight client state store for onboarding and auth state.
+- React Hook Form + Zod: reliable form handling and schema validation.
+- Lucide React: icon library.
+- clsx + tailwind-merge: utility class composition.
+- Sonner: toast notifications.
+- Supabase: PostgreSQL, Auth, Storage, RLS-ready backend.
+- Cloudinary: file storage for user uploads.
+- Resend: email notifications for verification and password reset.
+
+Environment Variables Required
+------------------------------
+- NEXT_PUBLIC_SUPABASE_URL - Supabase project URL.
+- NEXT_PUBLIC_SUPABASE_ANON_KEY - Supabase anonymous public key.
+- SUPABASE_SERVICE_ROLE_KEY - Supabase service role key for server operations.
+- NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME - Cloudinary cloud account name.
+- NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET - Cloudinary upload preset name.
+- RESEND_API_KEY - Resend API key for sending emails.
+- NEXT_PUBLIC_APP_URL - Public app origin (e.g. http://localhost:3000).
+
+How to Run Locally
+------------------
+1. Copy `.env.example` to `.env.local`.
+2. Populate environment variables with Supabase, Cloudinary, and Resend values.
+3. Run `npm install` to install dependencies.
+4. Run `npm run dev`.
+5. Open `http://localhost:3000` in a browser.
+
+How to Deploy on Vercel
+-----------------------
+1. Create a new Vercel project and connect your Git repository.
+2. Add environment variables from `.env.example` to the Vercel project settings.
+3. Use default build command `npm run build` and output directory `.next`.
+4. Deploy. Vercel automatically sets up CDN caching and SSR support.
+
+How to Connect Supabase
+-----------------------
+1. Create a Supabase project.
+2. Copy `SUPABASE_URL` and `SUPABASE_ANON_KEY` from the project settings.
+3. Set `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY` in `.env.local`.
+4. Add `SUPABASE_SERVICE_ROLE_KEY` for server-side operations.
+
+How to Configure Supabase Auth
+------------------------------
+1. Enable Email Auth in Supabase Authentication settings.
+2. Enable Google OAuth provider and set the redirect URL to:
+   `http://localhost:3000/auth/signup`
+3. Set the same redirect URL in production when deploying.
+4. Create a Supabase table `profiles` for user metadata.
+
+How to Create Supabase Tables
+-----------------------------
+Use the SQL editor in Supabase or execute the following script:
+
+```
+-- Users and profiles
+create table profiles (
+  id uuid default uuid_generate_v4() primary key,
+  email text unique not null,
+  full_name text,
+  phone text,
+  gender text,
+  college text,
+  branch text,
+  year text,
+  linkedin text,
+  ca_id text unique,
+  role text default 'AMBASSADOR',
+  tier text default 'Bronze',
+  points int default 0,
+  credits int default 0,
+  referral_code text,
+  pincode text,
+  city text,
+  state text,
+  verified boolean default false,
+  created_at timestamptz default now()
+);
+
+create table domains (
+  id uuid default uuid_generate_v4() primary key,
+  name text not null,
+  description text,
+  created_at timestamptz default now()
+);
+
+create table tasks (
+  id uuid default uuid_generate_v4() primary key,
+  title text not null,
+  description text,
+  instructions text,
+  points int default 0,
+  credits int default 0,
+  deadline timestamptz,
+  difficulty text,
+  proof_required jsonb,
+  domain text,
+  status text default 'locked',
+  created_at timestamptz default now()
+);
+
+create table task_submissions (
+  id uuid default uuid_generate_v4() primary key,
+  task_id uuid references tasks(id),
+  user_id uuid references profiles(id),
+  proof_url text,
+  proof_type text,
+  description text,
+  status text default 'pending_review',
+  created_at timestamptz default now()
+);
+
+create table submission_reviews (
+  id uuid default uuid_generate_v4() primary key,
+  submission_id uuid references task_submissions(id),
+  reviewer_id uuid references profiles(id),
+  status text,
+  feedback text,
+  reviewed_at timestamptz default now()
+);
+
+create table referrals (
+  id uuid default uuid_generate_v4() primary key,
+  referrer_id uuid references profiles(id),
+  referred_email text,
+  credited boolean default false,
+  created_at timestamptz default now()
+);
+
+create table points_ledger (
+  id uuid default uuid_generate_v4() primary key,
+  user_id uuid references profiles(id),
+  change int,
+  reason text,
+  created_at timestamptz default now()
+);
+
+create table notifications (
+  id uuid default uuid_generate_v4() primary key,
+  user_id uuid references profiles(id),
+  title text,
+  content text,
+  read boolean default false,
+  created_at timestamptz default now()
+);
+
+create table rewards (
+  id uuid default uuid_generate_v4() primary key,
+  name text,
+  description text,
+  points_required int,
+  created_at timestamptz default now()
+);
+
+create table store_orders (
+  id uuid default uuid_generate_v4() primary key,
+  user_id uuid references profiles(id),
+  product_id uuid,
+  quantity int,
+  amount int,
+  status text,
+  created_at timestamptz default now()
+);
+
+create table certificates (
+  id uuid default uuid_generate_v4() primary key,
+  user_id uuid references profiles(id),
+  title text,
+  issue_date timestamptz,
+  asset_url text,
+  created_at timestamptz default now()
+);
+
+create table email_verifications (
+  email text primary key,
+  token text,
+  created_at timestamptz default now()
+);
+```
+
+How to Setup RLS Policies
+-------------------------
+1. Enable RLS in the Supabase table settings for secure tables.
+2. Add policies such as:
+   - `auth.role() = 'authenticated'` to allow logged in users.
+   - `auth.uid() = user_id` for row-level ownership.
+   - `auth.role() = 'SUPER_ADMIN'` for admin access.
+3. Example policy for profiles:
+   - `using (auth.uid() = id OR auth.role() = 'SUPER_ADMIN')`
+4. Ensure `profiles` and `tasks` grant minimum read access to public and authenticated users.
+
+How to Setup Cloudinary
+------------------------
+1. Create a Cloudinary account.
+2. Create an upload preset with unsigned upload enabled.
+3. Add `NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME` and `NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET` to `.env.local`.
+4. Use `src/lib/cloudinary.ts` to upload files from the client.
+
+How to Setup Resend
+-------------------
+1. Create a Resend account.
+2. Copy your API key to `RESEND_API_KEY`.
+3. Use `src/lib/resend.ts` to send verification emails and notifications.
+
+How to Setup Google OAuth
+-------------------------
+1. Create Google OAuth credentials in the Google Cloud Console.
+2. Add the redirect URI: `http://localhost:3000/auth/signup`.
+3. In Supabase Auth settings, enable Google provider and configure the same redirect.
+4. Use the Google sign-in buttons in the auth pages.
+
+How to Create Admin Accounts
+----------------------------
+1. Create a profile in the Supabase `profiles` table.
+2. Set `role` field to `SUPER_ADMIN` or `PROGRAM_MANAGER`.
+3. Optionally use the Supabase dashboard to manage roles directly.
+4. Use the admin dashboard routes under `/dashboard/admin`.
+
+How to Assign Manager Roles
+---------------------------
+1. Create `profiles` entries for managers.
+2. Set `role` field to one of:
+   - PROGRAM_MANAGER
+   - DOMAIN_MANAGER
+   - TASK_REVIEWER
+   - COMMUNITY_MANAGER
+   - STORE_MANAGER
+   - FINANCE_MANAGER
+3. Use RBAC middleware to guard routes.
+
+Future Scalability Suggestions
+------------------------------
+- Add a server-side dashboard API layer with Next.js server actions.
+- Use Supabase Edge Functions for complex backend workflows.
+- Add dedicated Redux or tRPC for deeper workspace state management.
+- Add audit logs and analytics dashboards for admin monitoring.
+- Add real-time updates with Supabase Realtime subscriptions.
+- Introduce multi-tenant support for events and multiple ambassador programs.
+
+Known Limitations
+-----------------
+- Some dashboard features are scaffolded and need task submission / management business logic.
+- Google sign-in flow relies on Supabase OAuth redirect.
+- Email verification and referral validation are implemented as helper routes and need production email template refinement.
+- No production-grade spam/fraud engine is included yet.
+- Cloudinary upload helper is ready but no full upload form is rendered in the current UI.
+
+Architecture and File Explanations
+----------------------------------
+- `src/app/layout.tsx` → Root app layout, imports global styles and providers.
+- `src/app/page.tsx` → Public landing page with hero and feature cards.
+- `src/app/loading.tsx` → Loading placeholder displayed during route transitions.
+- `src/app/error.tsx` → Generic error boundary UI.
+- `src/app/not-found.tsx` → 404 page.
+- `src/app/(auth)/layout.tsx` → Layout wrapper for auth pages.
+- `src/app/(auth)/auth/signin/page.tsx` → Sign-in page with Google and email/password login.
+- `src/app/(auth)/auth/signup/page.tsx` → Multi-stage signup page handling onboarding flow.
+- `src/app/(auth)/auth/forgot-password/page.tsx` → Forgot password page.
+- `src/app/(dashboard)/layout.tsx` → Dashboard layout with sidebar and main area.
+- `src/app/(dashboard)/dashboard/*` → Dashboard routes under `/dashboard` for ambassador, manager, admin, and index.
+- `src/components/ui/button.tsx` → Reusable button component with styling variants.
+- `src/components/ui/card.tsx` → Reusable card wrapper.
+- `src/components/ui/feature-card.tsx` → UI component used on landing page.
+- `src/components/hero/hero-scene.tsx` → Three.js hero component with scene, lights, and animation.
+- `src/components/onboarding/onboarding-stepper.tsx` → Visual stepper for onboarding stages.
+- `src/components/dashboard/sidebar.tsx` → Dashboard sidebar navigation.
+- `src/components/dashboard/ambassador-overview.tsx` → Ambassador overview cards and stats.
+- `src/store/auth-store.ts` → Zustand store for onboarding state and email retention.
+- `src/lib/supabase.ts` → Supabase client initialization for browser and server.
+- `src/lib/cloudinary.ts` → Cloudinary upload helper.
+- `src/lib/resend.ts` → Resend email helper.
+- `src/lib/validators.ts` → Zod schemas for onboarding and auth form validation.
+- `src/services/auth.ts` → Auth service wrappers for signing in and out.
+- `src/services/user.ts` → User profile retrieval and updates.
+- `src/services/tasks.ts` → Task fetch and submission helpers.
+- `src/app/api/auth/send-verification/route.ts` → API route to issue verification emails.
+- `src/app/api/auth/verify/route.ts` → API route to consume verification tokens.
+- `src/middleware.ts` → Route guard middleware for protected dashboard routes.
+
+Request Flow Diagrams
+---------------------
+1. Public request:
+   - User opens `/` → `src/app/page.tsx` loads landing experience.
+2. Authentication flow:
+   - User clicks `/auth/signup` → Google OAuth or email form.
+   - Supabase OAuth returns to `/auth/signup`.
+   - Onboarding stage continues with locked email.
+3. Dashboard flow:
+   - Authenticated user visits `/dashboard`.
+   - `middleware.ts` verifies cookies and role guard.
+   - Dashboard layout loads proper side navigation and content.
+
+Authentication Flow Explanation
+-------------------------------
+- The app uses Supabase Auth for Google sign-in and password authentication.
+- The auth store keeps temporary onboarding session state locally for stage progress.
+- Google sign-in locks the email field and prevents editing during registration.
+- Password reset uses Supabase's built-in reset email flow.
+
+Task Approval Flow Explanation
+------------------------------
+- Tasks are modeled in the `tasks` table.
+- Submission records are stored in `task_submissions`.
+- Reviews are added to `submission_reviews` by managers.
+- Workflows can be extended with sequential unlock logic and approval status.
+
+Role Hierarchy Explanation
+--------------------------
+- SUPER_ADMIN controls the full platform and can manage all data.
+- PROGRAM_MANAGER oversees program-level workflows.
+- DOMAIN_MANAGER leads domain-level task performance.
+- TASK_REVIEWER moderates proof submissions.
+- COMMUNITY_MANAGER manages engagement and reports.
+- STORE_MANAGER tracks inventory and orders.
+- FINANCE_MANAGER handles credit accounting.
+- AMBASSADOR participates in tasks and earns rewards.
+
+Onboarding Flow Explanation
+--------------------------
+- Stage 1: Google Authentication begins on `/auth/signup`.
+- Stage 2: Basic information form collects profile details.
+- Stage 3: Location and referral form completes registration.
+- Final submission stores the profile in Supabase and assigns a CA ID.
+
+Database Relationship Explanation
+---------------------------------
+- `profiles` stores user metadata, roles, and ambassador stats.
+- `tasks` stores task definitions, domains, and proof requirements.
+- `task_submissions` links users to task proof records.
+- `submission_reviews` captures review actions and feedback.
+- `referrals` records referral credits and origin.
+- `points_ledger` tracks point transactions over time.
+- `notifications` stores in-app alert messages.
+- `rewards` holds reward definitions and redemption criteria.
+- `store_orders` tracks e-commerce checkout and fulfillment.
+- `certificates` stores generated certificate assets.
+
+Final Notes
+-----------
+This TCAP codebase is an MVP-ready architecture that is highly extensible. The current implementation demonstrates the required stack, route grouping, onboarding pipeline, RBAC structure, and dashboard scaffolds. Future improvements should add more operational workflows, deeper Supabase policies, real-time updates, and richer gamification content.
