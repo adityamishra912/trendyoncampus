@@ -87,7 +87,7 @@ export default function LeaderboardPage() {
                 {/* HEADING */}
                 <div className="mb-8 flex flex-col justify-center items-center">
 
-                    <h1 className="text-7xl
+                    <h1 className="text:5xl lg:text-7xl
             font-black
             tracking-tight
             text-[#2D2926]" style={{
@@ -138,7 +138,7 @@ export default function LeaderboardPage() {
                                 <div className="col-span-3 truncate text-[#6D4C41]">{user.college}</div>
                                 <div className="col-span-2 text-right">
                                     <span className="rounded-full border border-[#D4AF37]/40 bg-[#D4AF37]/15 px-4 py-2 text-sm font-bold text-[#8B6F47]">
-                                        {user.points} pts
+                                        {user.points} <span className="hidden lg:flex">pts</span>
                                     </span>
                                 </div>
                             </div>
