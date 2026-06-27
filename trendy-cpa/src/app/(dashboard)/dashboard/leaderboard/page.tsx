@@ -87,7 +87,7 @@ export default function LeaderboardPage() {
                 {/* HEADING */}
                 <div className="mb-8 flex flex-col justify-center items-center">
 
-                    <h1 className="text:5xl lg:text-7xl
+                    <h1 className="text-5xl lg:text-7xl
             font-black
             tracking-tight
             text-[#2D2926]" style={{
