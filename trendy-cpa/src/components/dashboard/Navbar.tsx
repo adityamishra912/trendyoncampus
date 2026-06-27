@@ -198,7 +198,7 @@ const Navbar = () => {
 
             {/* LOGO */}
 
-            {/* replace with your logo */}
+            {/* replace with your logo. */}
             <Link href={'/'}>
                 <img
                     src="/logo.png"
