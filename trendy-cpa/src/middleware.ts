@@ -13,7 +13,7 @@ export function middleware(request: NextRequest) {
   const session = request.cookies.get("tc_session")?.value;
   const role = request.cookies.get("tc_role")?.value;
 
-  const isAuthRoute = pathname === "/auth" || pathname.startsWith("/auth/");
+  // const isAuthRoute = pathname === "/auth" || pathname.startsWith("/auth/");
   const isDashboard = pathname === "/dashboard" || pathname.startsWith("/dashboard/");
   const isAdmin = pathname === "/admin" || pathname.startsWith("/admin/") || pathname.startsWith("/dashboard/admin");
   const isManager = pathname === "/manager" || pathname.startsWith("/manager/");
@@ -25,10 +25,10 @@ export function middleware(request: NextRequest) {
   }
 
   // If logged in, don't allow visiting auth pages (session saved)
-  if (session && isAuthRoute) {
-    url.pathname = "/dashboard/home";
-    return NextResponse.redirect(url);
-  }
+  // if (session && isAuthRoute) {
+  //   url.pathname = "/dashboard/home";
+  //   return NextResponse.redirect(url);
+  // }
 
   // Role-based access: only admin/manager can access /admin and /manager
   if (session && (isAdmin || isManager)) {

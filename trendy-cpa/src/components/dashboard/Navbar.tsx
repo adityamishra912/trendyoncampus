@@ -4,13 +4,10 @@ import {
     House,
     ListChecks,
     Medal,
-    UserRound,
     ShoppingBag,
     Trophy,
     Settings,
     Bell,
-    Moon,
-    Sun,
     Coins
 } from "lucide-react";
 import { auth, db } from "@/lib/firebase";
@@ -28,7 +25,7 @@ import {
     onSnapshot,
 } from "firebase/firestore";
 import Link from "next/link";
-import Image from "next/image";
+// import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { useState, useEffect } from "react";
 import { onAuthStateChanged } from "firebase/auth";
@@ -77,7 +74,7 @@ const navItems = [
         name: "store",
         label: "Store",
         href: "/dashboard/store",
-        icon: Trophy,
+        icon: ShoppingBag,
     },
     {
         name: "settings",
@@ -203,18 +200,18 @@ const Navbar = () => {
 
             {/* replace with your logo */}
             <Link href={'/'}>
-                <Image
+                <img
                     src="/logo.png"
                     alt="Logo"
                     width={220}
                     height={220}
-                    className="object-contain dark:invert transition-colors duration-300 fixed top-6 left-4 z-50 w-[120px] sm:w-[150px] lg:w-[220px]"
+                    className="object-contain dark:invert transition-colors duration-300 fixed top-6 left-4 z-[999] w-[120px] sm:w-[150px] lg:w-[220px] bg-transparent"
                 />
             </Link>
 
 
             {/* NAVBAR */}
-            <div className="fixed bottom-0 lg:top-4 left-0 right-0 z-50 px-4 py-3 lg:py-0">
+            <div className="fixed bottom-0 lg:top-4 left-0 right-0 z-50 px-4 py-3 lg:py-0 lg:h-60">
                 <div className="mx-auto flex w-full max-w-6xl justify-center">
                     <div className="flex items-center gap-3 overflow-x-auto rounded-[2rem] border border-slate-200/10 bg-white/95 px-3 py-3 shadow-xl shadow-slate-900/10 backdrop-blur-md lg:border-none lg:bg-transparent lg:shadow-none">
 

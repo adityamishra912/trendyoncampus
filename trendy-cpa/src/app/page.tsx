@@ -73,7 +73,7 @@ export default function GoldenHomePage() {
   const aboutRef = useRef<HTMLDivElement>(null);
   const techfestRef = useRef<HTMLDivElement>(null);
   const domainsRef = useRef<HTMLDivElement>(null);
-  const teamRef = useRef(null);
+  const teamRef = useRef<HTMLDivElement>(null);
   const faqRef = useRef<HTMLDivElement>(null);
   const navRef = useRef<HTMLDivElement>(null);
 
@@ -81,6 +81,7 @@ export default function GoldenHomePage() {
   const [expandedFAQ, setExpandedFAQ] = useState<number | null>(null);
   const [activeSection, setActiveSection] = useState("home");
 const [mobileMenu, setMobileMenu] = useState(false);
+
 useEffect(() => {
   document.body.style.overflow =
     mobileMenu ? "hidden" : "auto";
@@ -250,33 +251,53 @@ if (window.innerWidth > 768 && heroSection && heroCard) {
       .to(cardRef.current, { rotationZ: -4, duration: 0.3 }, 1.1)
       .to(cardRef.current, { rotationZ: 0, duration: 0.3 }, 1.4);
 
-    // 5. Domain Cards Stagger Animation
-    gsap.fromTo(".domain-card",
-      { opacity: 0, y: 40, rotationY: -20 },
-      {
-        opacity: 1,
-        y: 0,
-        rotationY: 0,
-        duration: 0.8,
-        ease: "back.out",
-        stagger: 0.15,
-        scrollTrigger: {
-          trigger: ".domains-section",
-          start: "top 75%",
-          end: "top 35%",
-          scrub: 1,
-        }
-      }
-    );
+    // 5. Desktop-only diagonal overlap animation for domain cards
+    if (window.innerWidth >= 1024) {
+      const desktopCards = gsap.utils.toArray<HTMLElement>(".domains-card-desktop");
+
+      desktopCards.forEach((card, index) => {
+        const fromX = index % 2 === 0 ? -140 : 140;
+        const fromY = index < 3 ? -70 : 70 + (index % 3) * 18;
+        const fromRotation = index % 3 === 0 ? -10 : index % 3 === 1 ? 8 : -6;
+
+        gsap.fromTo(
+          card,
+          {
+            opacity: 0,
+            x: fromX,
+            y: fromY,
+            rotation: fromRotation,
+            scale: 0.92,
+            transformPerspective: 1000,
+          },
+          {
+            opacity: 1,
+            x: 0,
+            y: 0,
+            rotation: 0,
+            scale: 1,
+            duration: 1,
+            ease: "power3.out",
+            scrollTrigger: {
+              trigger: ".domains-section",
+              start: "top 78%",
+              end: "top 20%",
+              scrub: 1,
+            },
+          }
+        );
+      });
+    }
 
     // 3D Mouse hover tilt for Desktop Domain Cards
-    const desktopDomainCards = containerRef.current?.querySelectorAll(".domains-card-desktop");
+    const desktopDomainCards = containerRef.current?.querySelectorAll<HTMLElement>(".domains-card-desktop");
     if (window.innerWidth > 1024) {
       desktopDomainCards?.forEach((card) => {
-        const onCardMouseMove = (e: MouseEvent) => {
+        const onCardMouseMove = (e: Event) => {
+          const mouseEvent = e as MouseEvent;
           const rect = card.getBoundingClientRect();
-          const x = e.clientX - rect.left;
-          const y = e.clientY - rect.top;
+          const x = mouseEvent.clientX - rect.left;
+          const y = mouseEvent.clientY - rect.top;
           const xc = rect.width / 2;
           const yc = rect.height / 2;
           const angleX = (yc - y) / 15;
@@ -305,7 +326,124 @@ if (window.innerWidth > 768 && heroSection && heroCard) {
       });
     }
 
-    // 6. Domain Title Animation
+    // 6. Section text and card reveal animations
+    gsap.fromTo(".about-title",
+      { opacity: 0, y: 30 },
+      {
+        opacity: 1,
+        y: 0,
+        duration: 0.8,
+        ease: "power2.out",
+        scrollTrigger: { trigger: "#about", start: "top 80%" }
+      }
+    );
+
+    gsap.fromTo(".about-copy",
+      { opacity: 0, y: 24 },
+      {
+        opacity: 1,
+        y: 0,
+        duration: 0.8,
+        delay: 0.1,
+        ease: "power2.out",
+        scrollTrigger: { trigger: "#about", start: "top 80%" }
+      }
+    );
+
+    gsap.fromTo(".about-card",
+      { opacity: 0, y: 30 },
+      {
+        opacity: 1,
+        y: 0,
+        duration: 0.8,
+        stagger: 0.12,
+        ease: "power2.out",
+        scrollTrigger: { trigger: "#about", start: "top 75%" }
+      }
+    );
+
+    gsap.fromTo(".techfest-card",
+      { opacity: 0, y: 35 },
+      {
+        opacity: 1,
+        y: 0,
+        duration: 0.9,
+        ease: "power2.out",
+        scrollTrigger: { trigger: ".resume-section", start: "top 75%" }
+      }
+    );
+
+    gsap.fromTo(".resume-title",
+      { opacity: 0, y: 24 },
+      {
+        opacity: 1,
+        y: 0,
+        duration: 0.8,
+        ease: "power2.out",
+        scrollTrigger: { trigger: ".resume-section", start: "top 80%" }
+      }
+    );
+
+    gsap.fromTo(".resume-copy",
+      { opacity: 0, y: 20 },
+      {
+        opacity: 1,
+        y: 0,
+        duration: 0.8,
+        delay: 0.08,
+        ease: "power2.out",
+        scrollTrigger: { trigger: ".resume-section", start: "top 80%" }
+      }
+    );
+
+    gsap.fromTo(".resume-card",
+      { opacity: 0, y: 40, scale: 0.96 },
+      {
+        opacity: 1,
+        y: 0,
+        scale: 1,
+        duration: 0.9,
+        ease: "power2.out",
+        scrollTrigger: { trigger: ".resume-section", start: "top 70%" }
+      }
+    );
+
+    gsap.fromTo(".resume-item",
+      { opacity: 0, x: -20 },
+      {
+        opacity: 1,
+        x: 0,
+        duration: 0.7,
+        stagger: 0.12,
+        ease: "power2.out",
+        scrollTrigger: { trigger: ".resume-section", start: "top 70%" }
+      }
+    );
+
+    gsap.fromTo(".resume-stats",
+      { opacity: 0, y: 20 },
+      {
+        opacity: 1,
+        y: 0,
+        duration: 0.8,
+        delay: 0.1,
+        ease: "power2.out",
+        scrollTrigger: { trigger: ".resume-section", start: "top 70%" }
+      }
+    );
+
+    gsap.fromTo(".resume-cta",
+      { opacity: 0, y: 20 },
+      {
+        opacity: 1,
+        y: 0,
+        duration: 0.8,
+        delay: 0.15,
+        ease: "power2.out",
+        scrollTrigger: { trigger: ".resume-section", start: "top 70%" }
+      }
+    );
+
     gsap.fromTo(".domains-title",
       { opacity: 0, y: 20 },
       {
@@ -322,59 +460,40 @@ if (window.innerWidth > 768 && heroSection && heroCard) {
       }
     );
 
-    // Desktop Domain Cards Animation - Staggered with 3D effect
-    gsap.fromTo(".domains-card-desktop",
-      { opacity: 0, y: 40, rotationY: -15, rotationX: 10 },
+    gsap.fromTo(".team-title",
+      { opacity: 0, y: 24 },
       {
         opacity: 1,
         y: 0,
-        rotationY: 0,
-        rotationX: 0,
         duration: 0.8,
-        ease: "back.out",
-        stagger: 0.12,
-        scrollTrigger: {
-          trigger: ".domains-section",
-          start: "top 70%",
-          end: "top 30%",
-          scrub: 1,
-        }
-      }
-    );
-
-    // Tablet Domain Cards Animation
-    gsap.fromTo(".domains-card-tablet",
-      { opacity: 0, y: 30, scale: 0.95 },
-      {
-        opacity: 1,
-        y: 0,
-        scale: 1,
-        duration: 0.7,
-        ease: "back.out",
-        stagger: 0.15,
-        scrollTrigger: {
-          trigger: ".domains-section",
-          start: "top 75%",
-          end: "top 35%",
-          scrub: 1,
-        }
-      }
-    );
-
-    // Mobile Domain Cards Animation - Vertical sliding entrance
-    gsap.fromTo(".domains-card-mobile",
-      { opacity: 0, y: 60 },
-      {
-        opacity: 1,
-        y: 0,
-        duration: 0.6,
         ease: "power2.out",
-        stagger: 0.15,
+        scrollTrigger: { trigger: "#team", start: "top 80%" }
+      }
+    );
+
+    gsap.fromTo(".team-copy",
+      { opacity: 0, y: 20 },
+      {
+        opacity: 1,
+        y: 0,
+        duration: 0.8,
+        delay: 0.05,
+        ease: "power2.out",
+        scrollTrigger: { trigger: "#team", start: "top 80%" }
+      }
+    );
+
+    gsap.fromTo(".team-card",
+      { opacity: 0, y: 50 },
+      {
+        opacity: 1,
+        y: 0,
+        stagger: 0.1,
+        duration: 0.8,
+        ease: "power2.out",
         scrollTrigger: {
-          trigger: ".domains-section",
-          start: "top 75%",
-          end: "top 20%",
-          scrub: 1,
+          trigger: "#team",
+          start: "top 80%"
         }
       }
     );
@@ -419,7 +538,13 @@ if (window.innerWidth > 768 && heroSection && heroCard) {
   {
     opacity: 1,
     y: 0,
-    stagger: 0.1
+    stagger: 0.1,
+    duration: 0.7,
+    ease: "power2.out",
+    scrollTrigger: {
+      trigger: ".faq-section",
+      start: "top 80%"
+    }
   }
 );
 
@@ -433,9 +558,89 @@ if (window.innerWidth > 768 && heroSection && heroCard) {
   if (!isMounted) return null;
 
   // Authentication
-  const handleApplyNow = () => {
-    router.push("/auth");
+    const handleApplyNow = async () => {
+    try {
+      const userCredential = await signInWithGoogle();
+
+      const user = userCredential.user;
+
+      /*
+      STEP 1:
+      Check if user exists in TEAM collection
+    */
+
+      const teamQuery = query(
+        collection(db, "team"),
+        where("email", "==", user.email)
+      );
+
+      const teamSnapshot =
+          await getDocs(teamQuery);
+
+      /*
+        TEAM MEMBER FOUND
+      */
+
+      if (!teamSnapshot.empty) {
+        const teamData = teamSnapshot.docs[0].data();
+
+        // STORE SESSION (sessionStorage + cookies)
+        const COOKIE_MAX_AGE = 60 * 60 * 24 * 30; // 30 days
+        const role = teamData.role || "ambassador";
+
+        sessionStorage.setItem("role", role);
+        sessionStorage.setItem("domain", teamData.domain || "");
+        sessionStorage.setItem("name", teamData.name || "");
+
+        document.cookie = `tc_session=1; path=/; max-age=${COOKIE_MAX_AGE}`;
+        document.cookie = `tc_role=${encodeURIComponent(role)}; path=/; max-age=${COOKIE_MAX_AGE}`;
+
+        // ROLE BASED REDIRECT
+        if (role === "admin") {
+          router.push("/admin");
+          return;
+        }
+
+        if (role === "manager") {
+          router.push("/manager");
+          return;
+        }
+      }
+
+      /*
+      STEP 2:
+      Normal campus ambassador user
+    */
+
+      // check if user already exists
+      const q = query(
+        collection(db, "users"),
+        where("uid", "==", user.uid)
+      );
+
+      const querySnapshot = await getDocs(q);
+
+      if (!querySnapshot.empty) {
+        // user already registered
+        const userData = querySnapshot.docs[0].data();
+        const role = userData.role || "ambassador";
+        const COOKIE_MAX_AGE = 60 * 60 * 24 * 30; // 30 days
+
+        sessionStorage.setItem("role", role);
+        document.cookie = `tc_session=1; path=/; max-age=${COOKIE_MAX_AGE}`;
+        document.cookie = `tc_role=${encodeURIComponent(role)}; path=/; max-age=${COOKIE_MAX_AGE}`;
+
+        router.push("/dashboard/home");
+      } else {
+        // new user - do not set session cookie so they can finish onboarding at /auth
+        router.push("/auth");
+      }
+
+    } catch (error) {
+      console.error(error);
+    }
   };
+
 
   return (
     <main ref={containerRef} className="min-h-screen bg-gradient-to-b from-[#1a1410]/95 via-[#2D2926]/90 to-[#3d3632]/85 text-white px-4 sm:px-8 py-4 sm:py-6 font-sans overflow-x-hidden">
@@ -484,15 +689,15 @@ if (window.innerWidth > 768 && heroSection && heroCard) {
                 Campus Ambassador Program
               </p>
               <h1 className="text-5xl sm:text-6xl lg:text-7xl xl:text-8xl font-black leading-tight text-white">
-                Voice of Campus
-                <span className="block text-[#D4AF37]">Lead the change.</span>
+                <span className="hero-title-line block">Voice of Campus</span>
+                <span className="hero-title-line block text-[#D4AF37]">Lead the change.</span>
               </h1>
 
-              <p className="max-w-2xl text-base md:text-lg text-white/85 leading-relaxed tracking-wide">
+              <p className="hero-desc max-w-2xl text-base md:text-lg text-white/85 leading-relaxed tracking-wide">
                 TRENDY empowers student leaders to build campus campaigns, grow communities, and unlock real-world opportunities across colleges nationwide.
               </p>
 
-              <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
+              <div className="hero-buttons flex flex-col gap-4 sm:flex-row sm:items-center">
                 <button onClick={handleApplyNow} className="relative inline-flex items-center justify-center overflow-hidden rounded-[2rem] bg-gradient-to-r from-[#D4AF37] to-[#B8860B] px-7 py-4 text-lg font-black text-white shadow-2xl shadow-[#B8860B]/30 transition duration-300 hover:-translate-y-0.5">
                   Apply Now
                 </button>
@@ -501,7 +706,7 @@ if (window.innerWidth > 768 && heroSection && heroCard) {
                 </button>
               </div>
 
-              <div className="grid grid-cols-2 gap-4 max-w-md">
+              <div className="hero-stats grid grid-cols-2 gap-4 max-w-md">
                 <div className="rounded-[1.75rem] border border-white/10 bg-white/10 p-5 backdrop-blur-sm">
                   <p className="text-3xl md:text-4xl font-black text-[#D4AF37]">500+</p>
                   <p className="text-sm text-white/80 mt-2">Students Impacted</p>
@@ -513,8 +718,8 @@ if (window.innerWidth > 768 && heroSection && heroCard) {
               </div>
             </div>
 
-            <div className="hidden lg:block">
-              <div className="rounded-[2rem] border border-white/10 bg-white/10 p-8 shadow-2xl shadow-black/20 backdrop-blur-xl">
+            <div className="hero-card-floating-wrapper hidden lg:block">
+              <div className="hero-card rounded-[2rem] border border-white/10 bg-white/10 p-8 shadow-2xl shadow-black/20 backdrop-blur-xl">
                 <p className="text-xs uppercase tracking-[0.35em] text-[#D4AF37]/90 font-semibold mb-4">Why TRENDY</p>
                 <ul className="space-y-5 text-white/85">
                   <li className="rounded-3xl border border-white/10 bg-white/5 p-5">
@@ -549,10 +754,10 @@ if (window.innerWidth > 768 && heroSection && heroCard) {
         <div className="grid gap-12 lg:grid-cols-[0.95fr_0.95fr] items-center">
           <div className="space-y-6">
             <p className="text-sm uppercase tracking-[0.35em] text-[#D4AF37]/80 font-semibold">Our Mission</p>
-            <h2 className="text-4xl sm:text-5xl md:text-6xl font-black text-white leading-tight">
+            <h2 className="about-title text-4xl sm:text-5xl md:text-6xl font-black text-white leading-tight">
               Build student leaders through strategy, creativity, and community.
             </h2>
-            <p className="text-base md:text-lg text-[#E8D69B]/90 leading-relaxed max-w-2xl">
+            <p className="about-copy text-base md:text-lg text-[#E8D69B]/90 leading-relaxed max-w-2xl">
               TRENDY Campus Ambassador Program is a premium student leadership experience designed to help campus innovators build skills, run campaigns, and earn recognition while connecting with like-minded peers.
             </p>
 
@@ -561,7 +766,7 @@ if (window.innerWidth > 768 && heroSection && heroCard) {
                 <h3 className="text-xl font-black text-[#D4AF37] mb-3">Campus Growth</h3>
                 <p className="text-sm text-[#E8D69B]/80 leading-relaxed">Lead events and outreach that create long-term campus impact.</p>
               </div>
-              <div className="rounded-[2rem] border border-[#D4AF37]/30 bg-white/5 backdrop-blur-sm p-6 shadow-lg shadow-[#B8860B]/10">
+              <div className="about-card rounded-[2rem] border border-[#D4AF37]/30 bg-white/5 backdrop-blur-sm p-6 shadow-lg shadow-[#B8860B]/10">
                 <h3 className="text-xl font-black text-[#D4AF37] mb-3">Career Skills</h3>
                 <p className="text-sm text-[#E8D69B]/80 leading-relaxed">Gain real-world experience in marketing, operations, and leadership.</p>
               </div>
@@ -587,7 +792,7 @@ if (window.innerWidth > 768 && heroSection && heroCard) {
               </div>
             </div>
 
-            <div ref={techfestRef} className="rounded-[2rem] border border-[#D4AF37]/30 bg-white/5 backdrop-blur-sm p-8 sm:p-10 shadow-2xl shadow-[#B8860B]/10">
+            <div ref={techfestRef} className="techfest-card rounded-[2rem] border border-[#D4AF37]/30 bg-white/5 backdrop-blur-sm p-8 sm:p-10 shadow-2xl shadow-[#B8860B]/10">
               <div className="inline-flex items-center gap-3 rounded-full bg-[#D4AF37]/20 px-4 py-2 text-sm font-semibold text-[#D4AF37] mb-6">
                 <Zap size={18} className="text-[#D4AF37]" /> TrendyFest</div>
               <h3 className="text-3xl md:text-4xl font-black text-white leading-tight mb-4">A festival for innovation, culture, and student leadership.</h3>
@@ -610,13 +815,13 @@ if (window.innerWidth > 768 && heroSection && heroCard) {
       {/* Resume Card Section (Rolling) */}
       <section className="resume-section max-w-5xl mx-auto mb-24 px-4 sm:px-6 lg:px-8 flex flex-col items-center">
         <div className="text-center mb-16">
-          <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black mb-6 bg-gradient-to-r from-[#D4AF37] to-[#E8D69B] bg-clip-text text-transparent">Build Your Resume</h2>
-          <p className="text-lg text-[#E8D69B]/80 max-w-md mx-auto">Showcase your journey, skills, and achievements in an impressive professional portfolio.</p>
+          <h2 className="resume-title text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black mb-6 bg-gradient-to-r from-[#D4AF37] to-[#E8D69B] bg-clip-text text-transparent">Build Your Resume</h2>
+          <p className="resume-copy text-lg text-[#E8D69B]/80 max-w-md mx-auto">Showcase your journey, skills, and achievements in an impressive professional portfolio.</p>
         </div>
 
         <div
           ref={cardRef}
-          className="relative w-full group rounded-[2rem] shadow-2xl shadow-[#B8860B]/40 overflow-hidden"
+          className="resume-card relative w-full group rounded-[2rem] shadow-2xl shadow-[#B8860B]/40 overflow-hidden"
         >
           {/* Animated Border Gradient */}
           <div className="absolute -inset-1 bg-gradient-to-r from-[#D4AF37] via-[#B8860B] to-[#8B6F47] rounded-[2rem] opacity-100 -z-10 group-hover:opacity-100 blur-lg transition-opacity duration-300"></div>
@@ -640,7 +845,7 @@ if (window.innerWidth > 768 && heroSection && heroCard) {
                 { title: "Projects", icon: Settings, desc: "Display innovative work", color: "from-[#B8860B] to-[#8B6F47]" },
                 { title: "Skills & Achievements", icon: Target, desc: "Highlight your expertise", color: "from-[#8B6F47] to-[#6D4C41]" }
               ].map((item, i) => (
-                <div key={i} className="group/item flex items-start gap-4 p-4 rounded-2xl hover:bg-gradient-to-r hover:from-[#D4AF37]/10 hover:to-[#B8860B]/10 transition-all duration-300">
+                <div key={i} className="resume-item group/item flex items-start gap-4 p-4 rounded-2xl hover:bg-gradient-to-r hover:from-[#D4AF37]/10 hover:to-[#B8860B]/10 transition-all duration-300">
                   <div className={`p-3 rounded-xl bg-gradient-to-br ${item.color} text-white shadow-md flex-shrink-0`}>
                     <item.icon size={22} />
                   </div>
@@ -654,7 +859,7 @@ if (window.innerWidth > 768 && heroSection && heroCard) {
             </div>
 
             {/* Stats */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8 p-4 bg-gradient-to-r from-[#D4AF37]/10 to-[#B8860B]/10 rounded-2xl border border-[#D4AF37]/20">
+            <div className="resume-stats grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8 p-4 bg-gradient-to-r from-[#D4AF37]/10 to-[#B8860B]/10 rounded-2xl border border-[#D4AF37]/20">
               <div className="text-center">
                 <p className="font-black text-2xl text-[#D4AF37]">1000+</p>
                 <p className="text-xs text-[#E8D69B]/80 font-semibold mt-1">Ambassadors</p>
@@ -670,7 +875,7 @@ if (window.innerWidth > 768 && heroSection && heroCard) {
             </div>
 
             {/* Action Button */}
-            <button className="w-full py-4 px-6 rounded-2xl bg-gradient-to-r from-[#D4AF37] to-[#B8860B] text-[#2D2926] font-black tracking-wide hover:from-[#FFD700] hover:to-[#D4AF37] transition-all duration-300 shadow-xl shadow-[#B8860B]/30 active:scale-[0.98] text-lg flex items-center justify-center gap-2 group/btn">
+            <button onClick={handleApplyNow} className="resume-cta w-full py-4 px-6 rounded-2xl bg-gradient-to-r from-[#D4AF37] to-[#B8860B] text-[#2D2926] font-black tracking-wide hover:from-[#FFD700] hover:to-[#D4AF37] transition-all duration-300 shadow-xl shadow-[#B8860B]/30 active:scale-[0.98] text-lg flex items-center justify-center gap-2 group/btn">
               <span>Edit & Build Portfolio</span>
               <ArrowRight size={20} className="group-hover/btn:translate-x-1 transition-transform" />
             </button>
@@ -698,7 +903,7 @@ if (window.innerWidth > 768 && heroSection && heroCard) {
           {domains.map((domain, index) => (
             <div
               key={index}
-              className={`domains-card-desktop group rounded-[2.5rem] border border-[#D4AF37]/30 bg-gradient-to-br from-white/5 to-[#D4AF37]/5 backdrop-blur-sm p-8 shadow-xl shadow-[#D4AF37]/10 transition-all duration-500 hover:border-[#D4AF37]/70 hover:bg-white/15 hover:shadow-2xl hover:shadow-[#D4AF37]/30 overflow-hidden relative
+              className={`domain-card domains-card-desktop group rounded-[2.5rem] border border-[#D4AF37]/30 bg-gradient-to-br from-white/5 to-[#D4AF37]/5 backdrop-blur-sm p-8 shadow-xl shadow-[#D4AF37]/10 transition-all duration-500 hover:border-[#D4AF37]/70 hover:bg-white/15 hover:shadow-2xl hover:shadow-[#D4AF37]/30 overflow-hidden relative
               ${index % 3 === 1 ? 'lg:mt-12' : ''}
               ${index % 3 === 2 ? 'lg:mt-24' : ''}`}
             >
@@ -724,7 +929,7 @@ if (window.innerWidth > 768 && heroSection && heroCard) {
           {domains.map((domain, index) => (
             <div
               key={index}
-              className="domains-card-tablet group rounded-[2rem] border border-[#D4AF37]/30 bg-white/5 backdrop-blur-sm p-8 shadow-xl shadow-[#D4AF37]/10 transition-all duration-400 hover:border-[#D4AF37]/60 hover:bg-white/10 hover:-translate-y-2 hover:shadow-2xl hover:shadow-[#D4AF37]/20 overflow-hidden relative"
+              className="domain-card domains-card-tablet group rounded-[2rem] border border-[#D4AF37]/30 bg-white/5 backdrop-blur-sm p-8 shadow-xl shadow-[#D4AF37]/10 transition-all duration-400 hover:border-[#D4AF37]/60 hover:bg-white/10 hover:-translate-y-2 hover:shadow-2xl hover:shadow-[#D4AF37]/20 overflow-hidden relative"
             >
               <div className="absolute inset-0 bg-gradient-to-br from-[#D4AF37]/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-400 -z-10"></div>
 
@@ -744,7 +949,7 @@ if (window.innerWidth > 768 && heroSection && heroCard) {
           {domains.map((domain, index) => (
             <div
               key={index}
-              className={`domains-card-mobile group rounded-2xl border border-[#D4AF37]/20 bg-gradient-to-r from-white/5 to-[#D4AF37]/5 backdrop-blur-sm p-6 shadow-lg shadow-[#D4AF37]/5 transition-all duration-400 hover:border-[#D4AF37]/50 hover:bg-white/10 active:scale-95`}
+              className={`domain-card domains-card-mobile group rounded-2xl border border-[#D4AF37]/20 bg-gradient-to-r from-white/5 to-[#D4AF37]/5 backdrop-blur-sm p-6 shadow-lg shadow-[#D4AF37]/5 transition-all duration-400 hover:border-[#D4AF37]/50 hover:bg-white/10 active:scale-95`}
             >
               <div className="flex gap-4 items-start">
                 <div className={`w-14 h-14 rounded-2xl bg-gradient-to-r ${domain.color} flex-shrink-0 flex items-center justify-center text-white shadow-lg transition-transform duration-400 group-hover:scale-110`}>
@@ -763,7 +968,7 @@ if (window.innerWidth > 768 && heroSection && heroCard) {
       </section>
 
       {/* Team Section */}
-      <section className="max-w-7xl mx-auto py-24 sm:py-32 px-4 sm:px-6 lg:px-8 space-y-16">
+      <section ref={teamRef} id="team" className="max-w-7xl mx-auto py-24 sm:py-32 px-4 sm:px-6 lg:px-8 space-y-16">
         <div className="text-center space-y-4">
           <div className="inline-flex items-center gap-2 rounded-full border border-[#D4AF37]/40 bg-gradient-to-r from-[#D4AF37]/10 to-[#B8860B]/10 px-4 py-2 text-[#D4AF37]">
             <Users size={16} className="text-[#D4AF37]" />
@@ -779,7 +984,7 @@ if (window.innerWidth > 768 && heroSection && heroCard) {
 
         <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {teamMembers.map((member, index) => (
-            <div key={index} className="group rounded-[2rem] border border-[#D4AF37]/30 bg-white/5 backdrop-blur-sm overflow-hidden shadow-xl shadow-[#D4AF37]/10 transition-all duration-300 hover:border-[#D4AF37]/60 hover:bg-white/10 hover:-translate-y-1">
+            <div key={index} className="team-card group rounded-[2rem] border border-[#D4AF37]/30 bg-white/5 backdrop-blur-sm overflow-hidden shadow-xl shadow-[#D4AF37]/10 transition-all duration-300 hover:border-[#D4AF37]/60 hover:bg-white/10 hover:-translate-y-1">
               {/* Profile Image */}
               <div className="relative h-64 bg-gradient-to-br from-[#D4AF37]/20 to-[#B8860B]/20 overflow-hidden flex items-center justify-center">
                 <div className="w-32 h-32 rounded-full bg-gradient-to-r from-[#D4AF37] to-[#B8860B] flex items-center justify-center text-5xl font-black text-[#2D2926]">
@@ -935,7 +1140,7 @@ if (window.innerWidth > 768 && heroSection && heroCard) {
         {/* CTA */}
         <div className="flex flex-col items-center gap-4 pt-8">
           <p className="text-[#E8D69B]/80 font-medium">Still have questions?</p>
-          <button className="group relative bg-gradient-to-r from-[#D4AF37] to-[#B8860B] text-[#2D2926] px-8 py-4 rounded-2xl font-black shadow-2xl shadow-[#B8860B]/40 hover:shadow-2xl hover:shadow-[#B8860B]/60 transition-all duration-300 flex items-center justify-center gap-2 overflow-hidden">
+          <button onClick={handleApplyNow} className="group relative bg-gradient-to-r from-[#D4AF37] to-[#B8860B] text-[#2D2926] px-8 py-4 rounded-2xl font-black shadow-2xl shadow-[#B8860B]/40 hover:shadow-2xl hover:shadow-[#B8860B]/60 transition-all duration-300 flex items-center justify-center gap-2 overflow-hidden">
             <span className="relative z-10">Get in Touch</span>
             <ArrowRight size={20} className="relative z-10 group-hover:translate-x-1 transition-transform" />
             <div className="absolute inset-0 bg-gradient-to-r from-[#FFD700] to-[#D4AF37] opacity-0 group-hover:opacity-100 transition-opacity -z-10"></div>

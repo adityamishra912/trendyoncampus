@@ -12,7 +12,7 @@ export default function Footer() {
 
                     {/* Brand */}
                     <div className="lg:col-span-2">
-                        <h2 className="text-2xl md:text-3xl md:text-5xl font-black text-black mb-4">
+                        <h2 className="text-2xl md:text-3xl lg:text-5xl font-black text-black mb-4">
                             TRENDY
                         </h2>
 
@@ -60,21 +60,21 @@ export default function Footer() {
                             </Link>
 
                             <Link
-                                href="/about"
+                                href="/"
                                 className="text-[#555] hover:text-black transition-colors"
                             >
                                 About Us
                             </Link>
 
                             <Link
-                                href="/trendyfest"
+                                href="/"
                                 className="text-[#555] hover:text-black transition-colors"
                             >
                                 TrendyFest
                             </Link>
 
                             <Link
-                                href="/faq"
+                                href="/"
                                 className="text-[#555] hover:text-black transition-colors"
                             >
                                 FAQ
@@ -91,12 +91,12 @@ export default function Footer() {
                         <div className="space-y-4 text-[#555]">
                             <div className="flex items-center gap-3">
                                 <Mail size={18} />
-                                <span>hello@trendy.com</span>
+                                <span>support@trendyoncampus.com</span>
                             </div>
 
                             <div className="flex items-center gap-3">
                                 <Phone size={18} />
-                                <span>+91 XXXXX XXXXX</span>
+                                <span>+91 7470671035</span>
                             </div>
                         </div>
                     </div>

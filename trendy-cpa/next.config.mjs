@@ -23,7 +23,7 @@
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  allowedDevOrigins: ["10.119.117.208"],
+  allowedDevOrigins: ["192.168.1.5"],
 
   typedRoutes: false,
 
