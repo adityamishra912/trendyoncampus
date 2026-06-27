@@ -236,7 +236,8 @@ const Navbar = () => {
                                         rounded-2xl
                                         lg:border
                                         transition-all duration-300
-                                        overflow-hidden
+                                        lg:overflow-hidden
+                                        
 
                                         ${isActive
                                             ? `
@@ -246,6 +247,7 @@ const Navbar = () => {
                                                 text-white
                                                 border-white/40
                                                 shadow-[0_10px_30px_rgba(212,175,55,0.15)]
+                                                overflow-hidden
                                             `
                                             : `
                                                 bg-white
