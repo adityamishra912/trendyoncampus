@@ -968,7 +968,7 @@ if (window.innerWidth > 768 && heroSection && heroCard) {
       </section>
 
       {/* Team Section */}
-      <section ref={teamRef} id="team" className="max-w-7xl mx-auto py-24 sm:py-32 px-4 sm:px-6 lg:px-8 space-y-16">
+      {/* <section ref={teamRef} id="team" className="max-w-7xl mx-auto py-24 sm:py-32 px-4 sm:px-6 lg:px-8 space-y-16">
         <div className="text-center space-y-4">
           <div className="inline-flex items-center gap-2 rounded-full border border-[#D4AF37]/40 bg-gradient-to-r from-[#D4AF37]/10 to-[#B8860B]/10 px-4 py-2 text-[#D4AF37]">
             <Users size={16} className="text-[#D4AF37]" />
@@ -986,21 +986,21 @@ if (window.innerWidth > 768 && heroSection && heroCard) {
           {teamMembers.map((member, index) => (
             <div key={index} className="team-card group rounded-[2rem] border border-[#D4AF37]/30 bg-white/5 backdrop-blur-sm overflow-hidden shadow-xl shadow-[#D4AF37]/10 transition-all duration-300 hover:border-[#D4AF37]/60 hover:bg-white/10 hover:-translate-y-1">
               {/* Profile Image */}
-              <div className="relative h-64 bg-gradient-to-br from-[#D4AF37]/20 to-[#B8860B]/20 overflow-hidden flex items-center justify-center">
+              {/* <div className="relative h-64 bg-gradient-to-br from-[#D4AF37]/20 to-[#B8860B]/20 overflow-hidden flex items-center justify-center">
                 <div className="w-32 h-32 rounded-full bg-gradient-to-r from-[#D4AF37] to-[#B8860B] flex items-center justify-center text-5xl font-black text-[#2D2926]">
                   {member.name?.charAt(0) || "?"}
                 </div>
-              </div>
+              </div> */}
 
               {/* Content */}
-              <div className="p-6 text-center space-y-4">
-                <div>
+              {/* <div className="p-6 text-center space-y-4"> */}
+                {/* <div>
                   <h3 className="text-xl font-black text-white mb-1">{member.name || "Team Member"}</h3>
                   <p className="text-sm text-[#D4AF37] font-semibold uppercase tracking-wider">{member.role}</p>
-                </div>
+                </div> */}
 
                 {/* Social Links */}
-                <div className="flex justify-center gap-3 pt-2">
+                {/* <div className="flex justify-center gap-3 pt-2">
                   <a 
                     href={member.instagram || "#"}
                     target="_blank"
@@ -1017,12 +1017,12 @@ if (window.innerWidth > 768 && heroSection && heroCard) {
                   >
                     <Linkedin size={18} />
                   </a>
-                </div>
-              </div>
-            </div>
+                </div> */}
+              {/* </div> */}
+            {/* </div>
           ))}
-        </div>
-      </section>
+        </div> 
+      </section> */}
 
       {/* FAQ Section */}
       <section ref={faqRef} className="faq-section max-w-4xl mx-auto py-24 sm:py-32 space-y-16 px-4 sm:px-6 lg:px-8">
